@@ -3,26 +3,26 @@ from wordcloud import WordCloud
 import pandas as pd
 from collections import Counter
 import emoji
+import os
 
 extract = URLExtract()
 
 def fetch_stats(selected_user, df):
-
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
-    # fetch the number of messages
+    # Fetch the number of messages
     num_messages = df.shape[0]
 
-    # fetch the total number of words
+    # Fetch the total number of words
     words = []
     for message in df['message']:
         words.extend(message.split())
 
-    # fetch number of media messages
+    # Fetch the number of media messages
     num_media_messages = df[df['message'] == '<Media omitted>\n'].shape[0]
 
-    # fetch number of links shared
+    # Fetch the number of links shared
     links = []
     for message in df['message']:
         links.extend(extract.find_urls(message))
@@ -36,9 +36,13 @@ def most_busy_users(df):
     return x, df
 
 def create_wordcloud(selected_user, df):
-
-    f = open('stop_hinglish.txt', 'r')
-    stop_words = f.read()
+    file_path = os.path.join(os.path.dirname(__file__), 'stop_hinglish.txt')
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            stop_words = f.read()
+    else:
+        stop_words = ""
+        raise FileNotFoundError("Stop words file not found!")
 
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
@@ -59,9 +63,13 @@ def create_wordcloud(selected_user, df):
     return df_wc
 
 def most_common_words(selected_user, df):
-
-    f = open('stop_hinglish.txt', 'r')
-    stop_words = f.read()
+    file_path = os.path.join(os.path.dirname(__file__), 'stop_hinglish.txt')
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            stop_words = f.read()
+    else:
+        stop_words = ""
+        raise FileNotFoundError("Stop words file not found!")
 
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
@@ -92,7 +100,6 @@ def emoji_helper(selected_user, df):
     return emoji_df
 
 def monthly_timeline(selected_user, df):
-
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
@@ -107,7 +114,6 @@ def monthly_timeline(selected_user, df):
     return timeline
 
 def daily_timeline(selected_user, df):
-
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
@@ -116,21 +122,18 @@ def daily_timeline(selected_user, df):
     return daily_timeline
 
 def week_activity_map(selected_user, df):
-
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
     return df['day_name'].value_counts()
 
 def month_activity_map(selected_user, df):
-
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
     return df['month'].value_counts()
 
 def activity_heatmap(selected_user, df):
-
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
